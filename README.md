@@ -1,5 +1,7 @@
 # Library of Babel
 
+Sort the Library of Babel with friends!
+
 ## Environment Setup
 
 Create and activate the Conda environment from `environment.yml`:
