@@ -1,14 +1,11 @@
-import struct
+# Sever connectivity
+USERNAME       = "John Doe"
+BOOK_LEN       = 5
+HOST           = "localhost"
+PORT           = 8080
 
-BOOK_LEN=5
-
-HOST = "localhost"
-PORT = 8080
-
-HEADER_FORMAT = "!I"
-CLIENT_FORMATS = ["15s", "!3d"]
-SERVER_FORMATS = ["15s", "!3d"]
-
-HEADER_SIZE = struct.calcsize(HEADER_FORMAT)
-CLIENT_SIZE = [struct.calcsize(format) for format in CLIENT_FORMATS]
-SERVER_SIZE = [struct.calcsize(format) for format in SERVER_FORMATS]
+# Game settings
+FPS            = 165
+HZ             = 1.0 / FPS
+TURN_SPEED     = 3
+MOVE_SPEED     = 5

@@ -1,19 +1,27 @@
+from collections.abc import Callable
+from itertools import chain
 import socketserver
 import struct
-from typing import cast
+from typing import Any, cast
 
-from constants import CLIENT_FORMATS, CLIENT_SIZE, HEADER_FORMAT, HEADER_SIZE, SERVER_FORMATS
+from protocol import HEADER_FORMAT, HEADER_SIZE
+from protocol.client import ClientEvents
+from protocol.server import ServerEvents, server_event_headers
 from server.server import Server
 
 
 class Handler(socketserver.BaseRequestHandler):
 	id: int
 	username: str
+	pos: tuple[float, float, float, float] = (0.0, 0.0, 0.0, 0.0)
 
 	def setup(self):
 		self.id = self.game_server.register_client(self)
 		self.username = f"Client {self.id}"
 		print(f"Client {self.id} connected from {self.client_address}")
+		with self.game_server.clients_lock:
+			self.send(ServerEvents.ROOM_INFO, (self.id, *chain.from_iterable((client.id, *client.pos, client.username.encode("ASCII")) for client in self.game_server.client_list)))
+				
 
 	def finish(self):
 		print(f"Client {self.id} ({self.username}): disconnected")
@@ -21,26 +29,42 @@ class Handler(socketserver.BaseRequestHandler):
 	
 	def handle(self):
 		while True:
-			event, data = self.recv()
-			if event is None or data is None: break
+			try: event, data = self.recv()
+			except Exception: break
 			self.event_handlers[event](*data)
 
-	def handle_username(self, username: str):
-		print(f"Client {self.id} ({self.username}): username={username}")
-		self.username = username
+	@property
+	def event_handlers(self) -> dict[ClientEvents, Callable[..., Any]]:
+		return {
+			ClientEvents.USERNAME: self.handle_username,
+			ClientEvents.POSITION: self.handle_position
+		}
 
-	def handle_position(self, x: float, y: float, z: float):
-		print(f"Client {self.id} ({self.username}): pos=({x}, {y}, {z})")
+	def handle_username(self, username: bytes):
+		self.username = username.rstrip(b"\x00").decode("ASCII")
+		self.broadcast(ServerEvents.PLAYER_USERNAME, (self.id, username))
+		print(f"Client {self.id}: username={self.username}")
+
+	def handle_position(self, x: float, z: float, yaw: float, pitch: float):
+		self.pos = (x, z, yaw, pitch)
+		self.broadcast(ServerEvents.PLAYER_POSITION, (self.id, x, z, yaw, pitch))
 		
 	def recv(self):
 		raw_header = self.recv_size(HEADER_SIZE)
-		if not raw_header: return (None, None)
-		header = struct.unpack(HEADER_FORMAT, raw_header)[0]
-		if header >= len(CLIENT_FORMATS): return (None, None)
-		raw_data = self.recv_size(CLIENT_SIZE[header])
-		if not raw_data: return (None, None)
-		data = struct.unpack(CLIENT_FORMATS[header], raw_data)
-		return (header, data)
+		if not raw_header: raise ValueError
+		event, format_length = struct.unpack(HEADER_FORMAT, raw_header)
+		try: event = ClientEvents(event)
+		except ValueError: raise ValueError
+		
+		raw_format = self.recv_size(format_length)
+		if not raw_format: raise ValueError
+		format: str = struct.unpack(f"{format_length}s", raw_format)[0].decode("ASCII")
+		
+		raw_data = self.recv_size(struct.calcsize(format))
+		if not raw_data: raise ValueError
+		data = struct.unpack(format, raw_data)
+		
+		return (event, data)
 	
 	def recv_size(self, size: int):
 		buf = bytearray()
@@ -50,15 +74,17 @@ class Handler(socketserver.BaseRequestHandler):
 			buf.extend(chunk)
 		return bytes(buf)
 
-	def send(self, event: int, *data):
-		self.send_raw(struct.pack(SERVER_FORMATS[event], *data))
+	def broadcast(self, event: ServerEvents, data: tuple[Any, ...]):
+		self.game_server.broadcast(event, data, exclude=(self.id,))
+
+	def send(self, event: ServerEvents, data: tuple[Any, ...]):
+		format = server_event_headers[event](*data)
+		self.send_raw(struct.pack(HEADER_FORMAT, event, N := len(format)))
+		self.send_raw(struct.pack(f"{N}s", format.encode("ASCII")))
+		self.send_raw(struct.pack(format, *data))
 
 	def send_raw(self, buf: bytes):
 		self.request.sendall(buf)
-
-	@property
-	def event_handlers(self):
-		return [self.handle_username, self.handle_position]
 
 	@property
 	def game_server(self) -> Server:

@@ -1,52 +1,27 @@
-import socket
+import os
 import threading
 
-from vpython import color, keysdown, rate, scene, sphere, vec
+from client import stop_event
+from client.game import game
+from client.tcp_client import tcp_client
 
-from constants import HOST, PORT
+thread_error: BaseException | None = None
 
+def stop_on_except(f):
+	def wrapper():
+		global thread_error
+		try: f()
+		except BaseException as e: thread_error = e
+		finally: stop_event.set()
+	return wrapper
 
-def udp_client():
-	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	sock.connect((HOST, PORT))
-
-	while True:
-		pass
-
-def graphics():
-	while True:
-		rate(10)
-
-def controls():
-	while True:
-		rate(10)
-		k = keysdown()
-
-		speed = 0
-
-		if 'w' in k:
-			speed += 1
-		if 's' in k:
-			speed += -1
-
-		scene.camera.pos += scene.forward * speed
-
-def physics():
-	pass
-
-
-scene.userzoom = False
-scene.userspin = False
-scene.userpan = False
-
-sphere = sphere(pos=vec(0,0,0), color = color.red, radius = 0.5)
-
-thread_udp_client = threading.Thread(target=udp_client)
-thread_graphics = threading.Thread(target=graphics)
-thread_controls = threading.Thread(target=controls)
-thread_physics = threading.Thread(target=physics)
-
-threads = [thread_udp_client, thread_graphics, thread_controls, thread_physics]
+threads = [threading.Thread(target=stop_on_except(target), daemon=True) for target in [tcp_client, game]]
 
 for t in threads: t.start()
-for t in threads: t.join()
+
+try:
+	stop_event.wait()
+finally:
+	stop_event.set()
+	for t in threads: t.join(timeout=1.0)
+	os._exit(1 if thread_error else 0)
