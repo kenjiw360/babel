@@ -1,12 +1,23 @@
-from vpython import keysdown, rate, scene, norm, cross, sin, cos, vec, pi
+from vpython import keysdown, rate, scene, norm, cross, sin, cos, vec, pi, color, sphere, box
 from client.tcp_client import send
-from constants import FPS, HZ, MOVE_SPEED, TURN_SPEED
+from constants import FPS, MOVE_SPEED, TURN_SPEED
 from client import stop_event
 from protocol.client import ClientEvents
 
+HZ = 1.0 / FPS
+
+scene.userzoom = False
+scene.userspin = False
+scene.userpan = False
+scene.autoscale = False
+scene.camera.pos = vec(0, 1, 5)
+scene.camera.axis = vec(0, 0, -1)
+
+object = sphere(pos=vec(0, 1, 0), color = color.red, radius = 0.5)
+floor = box(pos=vec(0, 0, 0), size=vec(40, 0.2, 40), color=color.gray(0.5))
+
 pitch = 0.0
 yaw = -0.5 * pi
-scene.camera.axis = vec(cos(yaw) * cos(pitch), sin(pitch), sin(yaw) * cos(pitch))
 
 def clamped(x):
 	return max(-0.49*pi, min(0.49*pi, x))
