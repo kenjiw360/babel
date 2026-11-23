@@ -21,6 +21,7 @@ class Handler(socketserver.BaseRequestHandler):
 		print(f"Client {self.id} connected from {self.client_address}")
 		with self.game_server.clients_lock:
 			self.send(ServerEvents.ROOM_INFO, (self.id, *chain.from_iterable((client.id, *client.pos, client.username.encode("ASCII")) for client in self.game_server.client_list)))
+		self.broadcast(ServerEvents.PLAYER_JOIN, (self.id, *self.pos, self.username.encode("ASCII")))
 				
 
 	def finish(self):
