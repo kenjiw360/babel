@@ -1,9 +1,5 @@
 from dataclasses import dataclass
 import threading
-from vpython import color, scene, sphere, vec, box
-
-from constants import FPS
-
 
 stop_event = threading.Event()
 

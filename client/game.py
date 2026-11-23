@@ -1,10 +1,12 @@
 from vpython import keysdown, rate, scene, norm, cross, sin, cos, vec, pi, color, sphere, box
 from client.tcp_client import send
-from constants import FPS, MOVE_SPEED, TURN_SPEED
+from constants import FPS
 from client import stop_event
 from protocol.client import ClientEvents
 
 HZ = 1.0 / FPS
+MOVE_SPEED = 5
+TURN_SPEED = 3
 
 scene.userzoom = False
 scene.userspin = False
