@@ -27,10 +27,17 @@ python -m client
 
 ## Editing settings
 
-Edit the connection settings in `constants.py`.
+Edit the game and server settings in `constants.py`.
 
 ```python
-BOOK_LEN=5
+# Sever connectivity
+USERNAME = "JorgeLuisBorges"
 HOST = "localhost"
 PORT = 8080
+
+# Server settings
+BOOK_LEN = 5
+
+# Game settings
+FPS = 165
 ```

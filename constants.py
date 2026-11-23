@@ -1,8 +1,10 @@
 # Sever connectivity
-USERNAME       = "John Doe"
-BOOK_LEN       = 5
-HOST           = "localhost"
-PORT           = 8080
+USERNAME = "JorgeLuisBorges"
+HOST = "localhost"
+PORT = 8080
+
+# Server settings
+BOOK_LEN = 5
 
 # Game settings
-FPS            = 165
+FPS = 165
