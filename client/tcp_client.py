@@ -1,5 +1,6 @@
 from collections.abc import Callable
 from itertools import batched
+import logging
 import socket
 import struct
 from typing import Any
@@ -10,7 +11,10 @@ from protocol import HEADER_FORMAT, HEADER_SIZE
 from protocol.client import ClientEvents, client_event_headers
 from protocol.server import ServerEvents
 
+logger = logging.getLogger(__name__)
+
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+sock.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
 sock.settimeout(0.2)
 
 def send(event: ClientEvents, data: tuple[Any, ...]):
@@ -80,6 +84,8 @@ def tcp_client():
 	while not stop_event.is_set():
 		try: event, data = recv()
 		except TimeoutError: continue
-		except Exception: return stop_event.set()
+		except Exception:
+			logger.exception("TCP client error")
+			raise
 		event_handlers[event](*data)
 	sock.close()
