@@ -48,7 +48,7 @@ def game():
 			scene.camera.axis = vector(cos(yaw) * cos(pitch), sin(pitch), sin(yaw) * cos(pitch))
 	
 			forward = norm(vector(scene.camera.axis.x, 0, scene.camera.axis.z))
-			right = cross(vector(0, 1, 0), forward)
+			right = cross(forward, vector(0, 1, 0))
 			if "w" in k: scene.camera.pos += forward * MOVE_SPEED * HZ
 			if "s" in k: scene.camera.pos -= forward * MOVE_SPEED * HZ
 			if "d" in k: scene.camera.pos += right * MOVE_SPEED * HZ
