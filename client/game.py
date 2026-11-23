@@ -1,7 +1,7 @@
-from vpython import keysdown, rate, scene, norm, cross, sin, cos, vector, pi, color, sphere, box, winput, wtext
+from vpython import keysdown, rate, scene, norm, cross, sin, cos, vector, pi, color, sphere, box
 
 from client import stop_event
-from client.tcp_client import send
+from client.tcp_socket import send
 from constants import FPS
 from protocol.client import ClientEvents
 
@@ -9,12 +9,6 @@ from protocol.client import ClientEvents
 HZ = 1.0 / FPS
 MOVE_SPEED = 5
 TURN_SPEED = 3
-
-def set_username(input: winput):
-	username = input.text
-	if username is not None: send(ClientEvents.USERNAME, (username.encode("ASCII"),))
-wtext(text="Username: ")
-username_input = winput(bind=set_username)
 
 scene.userzoom = False
 scene.userspin = False

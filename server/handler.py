@@ -13,6 +13,7 @@ from server.server import Server
 class Handler(socketserver.BaseRequestHandler):
 	id: int
 	username: str
+	color: tuple[float, float, float] = (0.0, 0.0, 1.0)
 	pos: tuple[float, float, float] = (0.0, 0.0, 0.0)
 
 	def setup(self):
@@ -20,8 +21,8 @@ class Handler(socketserver.BaseRequestHandler):
 		self.username = f"Client {self.id}"
 		print(f"Client {self.id} connected from {self.client_address}")
 		with self.game_server.clients_lock:
-			self.send(ServerEvents.ROOM_INFO, (self.id, *chain.from_iterable((client.id, *client.pos, client.username.encode("ASCII")) for client in self.game_server.client_list)))
-		self.broadcast(ServerEvents.PLAYER_JOIN, (self.id, *self.pos, self.username.encode("ASCII")))
+			self.send(ServerEvents.ROOM_INFO, (self.id, *chain.from_iterable((client.id, *client.pos, client.username.encode("ASCII"), *client.color) for client in self.game_server.client_list)))
+		self.broadcast(ServerEvents.PLAYER_JOIN, (self.id, *self.pos, self.username.encode("ASCII"), *self.color))
 				
 
 	def finish(self):
@@ -38,13 +39,14 @@ class Handler(socketserver.BaseRequestHandler):
 	@property
 	def event_handlers(self) -> dict[ClientEvents, Callable[..., Any]]:
 		return {
-			ClientEvents.USERNAME: self.handle_username,
+			ClientEvents.INFO: self.handle_info,
 			ClientEvents.POSITION: self.handle_position
 		}
 
-	def handle_username(self, username: bytes):
+	def handle_info(self, username: bytes, r: float, g: float, b: float):
 		self.username = username.rstrip(b"\x00").decode("ASCII")
-		self.broadcast(ServerEvents.PLAYER_USERNAME, (self.id, username))
+		self.color = (r, g, b)
+		self.broadcast(ServerEvents.PLAYER_INFO, (self.id, username, r, g, b))
 		print(f"Client {self.id}: username={self.username}")
 
 	def handle_position(self, x: float, z: float, yaw: float):
