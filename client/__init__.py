@@ -28,6 +28,8 @@ class Player:
 		self.pos = (x, z)
 		self.body.pos = vector(x, 0, z)
 		self.body.axis = vector(cos(yaw), 0, sin(yaw))
+		for attachment, pos in self.attachments:
+			attachment.pos = self.body.compound_to_world(pos)
 	
 	def setUsername(self, username: str):
 		self.tag.text = self.username = username

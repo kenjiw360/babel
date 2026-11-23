@@ -1,4 +1,4 @@
-from vpython import keysdown, rate, scene, norm, cross, sin, cos, vector, pi, color, sphere, box, button, winput, wtext
+from vpython import keysdown, rate, scene, norm, cross, sin, cos, vector, pi, color, sphere, box, winput, wtext
 
 from client import room, room_lock, stop_event, id
 from client.tcp_client import send
@@ -54,9 +54,3 @@ def game():
 			if "a" in k: scene.camera.pos -= right * MOVE_SPEED * HZ
 	
 			send(ClientEvents.POSITION, (scene.camera.pos.x, scene.camera.pos.z, yaw))
-
-		with room_lock:
-			for player in room.values():
-				if player.id == id[0]: continue
-				for attachment, pos in player.attachments:
-					attachment.pos = player.body.compound_to_world(pos)
