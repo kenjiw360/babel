@@ -38,3 +38,4 @@ class Player:
 			attachment.visible = False
 
 room: dict[int, Player] = {}
+room_lock = threading.Lock()

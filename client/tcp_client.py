@@ -4,7 +4,7 @@ import socket
 import struct
 from typing import Any
 
-from client import stop_event, room, Player, id
+from client import room_lock, stop_event, room, Player, id
 from constants import HOST, PORT
 from protocol import HEADER_FORMAT, HEADER_SIZE
 from protocol.client import ClientEvents, client_event_headers
@@ -21,25 +21,32 @@ def send(event: ClientEvents, data: tuple[Any, ...]):
 
 def room_info(cid: int, *args):
 	id.append(cid)
-	for pid, x, z, yaw, username in batched(args, 6):
-		room[pid] = Player(pid, username.rstrip(b"\x00").decode("ASCII"), x, z, yaw)
-		if pid == id[0]: room[pid].hide()
+	with room_lock:
+		for pid, x, z, yaw, username in batched(args, 5):
+			room[pid] = Player(pid, username.rstrip(b"\x00").decode("ASCII"), x, z, yaw)
+			if pid == id[0]: room[pid].hide()
 
 def player_join(pid, x, z, yaw, username):
-	room[pid] = Player(pid, username.rstrip(b"\x00").decode("ASCII"), x, z, yaw)
+	with room_lock:
+		room[pid] = Player(pid, username.rstrip(b"\x00").decode("ASCII"), x, z, yaw)
 
 def player_leave(pid: int):
-	room[pid].hide()
-	del room[pid]
+	with room_lock:
+		room[pid].hide()
+		del room[pid]
 
 def player_username(pid: int, username: bytes):
-	room[pid].setUsername(username.rstrip(b"\x00").decode("ASCII"))
+	with room_lock:
+		room[pid].setUsername(username.rstrip(b"\x00").decode("ASCII"))
 
 def player_position(pid: int, x: float, z: float, yaw: float):
-	room[pid].setPos(x, z, yaw)
+	with room_lock:
+		room[pid].setPos(x, z, yaw)
 
 event_handlers: dict[ServerEvents, Callable[..., Any]] = {
 	ServerEvents.ROOM_INFO: room_info,
+	ServerEvents.PLAYER_JOIN: player_join,
+	ServerEvents.PLAYER_LEAVE: player_leave,
 	ServerEvents.PLAYER_USERNAME: player_username,
 	ServerEvents.PLAYER_POSITION: player_position
 }

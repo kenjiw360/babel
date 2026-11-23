@@ -1,6 +1,6 @@
 from vpython import keysdown, rate, scene, norm, cross, sin, cos, vector, pi, color, sphere, box, button, winput, wtext
 
-from client import room, stop_event, id
+from client import room, room_lock, stop_event, id
 from client.tcp_client import send
 from constants import FPS
 from protocol.client import ClientEvents
@@ -55,7 +55,8 @@ def game():
 	
 			send(ClientEvents.POSITION, (scene.camera.pos.x, scene.camera.pos.z, yaw))
 
-		for player in room.values():
-			if player.id == id[0]: continue
-			for attachment, pos in player.attachments:
-				attachment.pos = player.body.compound_to_world(pos)
+		with room_lock:
+			for player in room.values():
+				if player.id == id[0]: continue
+				for attachment, pos in player.attachments:
+					attachment.pos = player.body.compound_to_world(pos)
