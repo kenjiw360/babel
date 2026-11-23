@@ -4,7 +4,7 @@ import socket
 import struct
 from typing import Any
 
-from client import stop_event, room, Player
+from client import stop_event, room, Player, id
 from constants import HOST, PORT, USERNAME
 from protocol import HEADER_FORMAT, HEADER_SIZE
 from protocol.client import ClientEvents, client_event_headers
@@ -12,7 +12,6 @@ from protocol.server import ServerEvents
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 sock.settimeout(0.2)
-id: int
 
 def send(event: ClientEvents, data: tuple[Any, ...]):
 	format = client_event_headers[event](*data)
@@ -21,18 +20,21 @@ def send(event: ClientEvents, data: tuple[Any, ...]):
 	sock.sendall(struct.pack(format, *data))
 
 def room_info(cid: int, *args):
-	global id
-	id = cid
-	for pid, x, z, yaw, pitch, username in batched(args, 6):
-		room[pid] = Player(pid, username.rstrip(b"\x00").decode("ASCII"), (x, z), (yaw, pitch))
-	print(room)
+	id.append(cid)
+	for pid, x, z, yaw, username in batched(args, 6):
+		room[pid] = Player(pid, username.rstrip(b"\x00").decode("ASCII"), x, z, yaw)
+		if pid == id[0]: room[pid].hide()
 
 def player_username(pid: int, username: bytes):
-	room[pid].username = username.rstrip(b"\x00").decode("ASCII")
+	room[pid].setUsername(username.rstrip(b"\x00").decode("ASCII"))
 
-def player_position(pid: int, x: float, z: float, yaw: float, pitch: float):
-	room[pid].pos = (x, z)
-	room[pid].rot = (yaw, pitch)
+def player_position(pid: int, x: float, z: float, yaw: float):
+	room[pid].setPos(x, z, yaw)
+
+def player_leave(pid: int):
+	room[pid].body.visible = False
+	for attachment in room[pid].attachments: attachment.visible = False
+	del room[pid]
 
 event_handlers: dict[ServerEvents, Callable[..., Any]] = {
 	ServerEvents.ROOM_INFO: room_info,

@@ -1,8 +1,10 @@
 from vpython import keysdown, rate, scene, norm, cross, sin, cos, vec, pi, color, sphere, box
+
+from client import room, stop_event, id
 from client.tcp_client import send
 from constants import FPS
-from client import stop_event
 from protocol.client import ClientEvents
+
 
 HZ = 1.0 / FPS
 MOVE_SPEED = 5
@@ -12,14 +14,14 @@ scene.userzoom = False
 scene.userspin = False
 scene.userpan = False
 scene.autoscale = False
-scene.camera.pos = vec(0, 1, 5)
-scene.camera.axis = vec(0, 0, -1)
+scene.camera.pos = vec(0, 1, 0)
+scene.camera.axis = vec(0, 0, 1)
 
-object = sphere(pos=vec(0, 1, 0), color = color.red, radius = 0.5)
-floor = box(pos=vec(0, 0, 0), size=vec(40, 0.2, 40), color=color.gray(0.5))
+object = sphere(pos=vec(0, 1, 5), color = color.red, radius = 1)
+floor = box(pos=vec(0, -0.1, 0), size=vec(40, 0.2, 40), color=color.gray(0.5))
 
 pitch = 0.0
-yaw = -0.5 * pi
+yaw = 0.5 * pi
 
 def clamped(x):
 	return max(-0.49*pi, min(0.49*pi, x))
@@ -45,4 +47,9 @@ def game():
 			if "d" in k: scene.camera.pos += right * MOVE_SPEED * HZ
 			if "a" in k: scene.camera.pos -= right * MOVE_SPEED * HZ
 	
-			send(ClientEvents.POSITION, (scene.camera.pos.x, scene.camera.pos.z, yaw, pitch))
+			send(ClientEvents.POSITION, (scene.camera.pos.x, scene.camera.pos.z, yaw))
+
+		for player in room.values():
+			if player.id == id[0]: continue
+			for attachment, pos in player.attachments:
+				attachment.pos = player.body.compound_to_world(pos)

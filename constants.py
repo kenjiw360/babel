@@ -1,6 +1,6 @@
 # Sever connectivity
 USERNAME = "JorgeLuisBorges"
-HOST = "localhost"
+HOST = "0.0.0.0"
 PORT = 8080
 
 # Server settings

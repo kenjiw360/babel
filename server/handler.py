@@ -1,7 +1,7 @@
-from collections.abc import Callable
-from itertools import chain
 import socketserver
 import struct
+from collections.abc import Callable
+from itertools import chain
 from typing import Any, cast
 
 from protocol import HEADER_FORMAT, HEADER_SIZE
@@ -13,7 +13,7 @@ from server.server import Server
 class Handler(socketserver.BaseRequestHandler):
 	id: int
 	username: str
-	pos: tuple[float, float, float, float] = (0.0, 0.0, 0.0, 0.0)
+	pos: tuple[float, float, float] = (0.0, 0.0, 0.0)
 
 	def setup(self):
 		self.id = self.game_server.register_client(self)
@@ -26,6 +26,7 @@ class Handler(socketserver.BaseRequestHandler):
 	def finish(self):
 		print(f"Client {self.id} ({self.username}): disconnected")
 		self.game_server.unregister_client(self.id)
+		self.broadcast(ServerEvents.PLAYER_LEAVE, (self.id,))
 	
 	def handle(self):
 		while True:
@@ -45,9 +46,9 @@ class Handler(socketserver.BaseRequestHandler):
 		self.broadcast(ServerEvents.PLAYER_USERNAME, (self.id, username))
 		print(f"Client {self.id}: username={self.username}")
 
-	def handle_position(self, x: float, z: float, yaw: float, pitch: float):
-		self.pos = (x, z, yaw, pitch)
-		self.broadcast(ServerEvents.PLAYER_POSITION, (self.id, x, z, yaw, pitch))
+	def handle_position(self, x: float, z: float, yaw: float):
+		self.pos = (x, z, yaw)
+		self.broadcast(ServerEvents.PLAYER_POSITION, (self.id, x, z, yaw))
 		
 	def recv(self):
 		raw_header = self.recv_size(HEADER_SIZE)
