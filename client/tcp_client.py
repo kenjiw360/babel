@@ -5,7 +5,7 @@ import struct
 from typing import Any
 
 from client import stop_event, room, Player, id
-from constants import HOST, PORT, USERNAME
+from constants import HOST, PORT
 from protocol import HEADER_FORMAT, HEADER_SIZE
 from protocol.client import ClientEvents, client_event_headers
 from protocol.server import ServerEvents
@@ -25,16 +25,18 @@ def room_info(cid: int, *args):
 		room[pid] = Player(pid, username.rstrip(b"\x00").decode("ASCII"), x, z, yaw)
 		if pid == id[0]: room[pid].hide()
 
+def player_join(pid, x, z, yaw, username):
+	room[pid] = Player(pid, username.rstrip(b"\x00").decode("ASCII"), x, z, yaw)
+
+def player_leave(pid: int):
+	room[pid].hide()
+	del room[pid]
+
 def player_username(pid: int, username: bytes):
 	room[pid].setUsername(username.rstrip(b"\x00").decode("ASCII"))
 
 def player_position(pid: int, x: float, z: float, yaw: float):
 	room[pid].setPos(x, z, yaw)
-
-def player_leave(pid: int):
-	room[pid].body.visible = False
-	for attachment in room[pid].attachments: attachment.visible = False
-	del room[pid]
 
 event_handlers: dict[ServerEvents, Callable[..., Any]] = {
 	ServerEvents.ROOM_INFO: room_info,
@@ -68,7 +70,6 @@ def recv():
 
 def tcp_client():
 	sock.connect((HOST, PORT))
-	send(ClientEvents.USERNAME, (USERNAME.encode("ASCII"),))
 	while not stop_event.is_set():
 		try: event, data = recv()
 		except TimeoutError: continue

@@ -31,7 +31,6 @@ Edit the game and server settings in `constants.py`.
 
 ```python
 # Sever connectivity
-USERNAME = "JorgeLuisBorges"
 HOST = "localhost"
 PORT = 8080
 

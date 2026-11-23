@@ -1,4 +1,4 @@
-from vpython import keysdown, rate, scene, norm, cross, sin, cos, vec, pi, color, sphere, box
+from vpython import keysdown, rate, scene, norm, cross, sin, cos, vector, pi, color, sphere, box, button, winput, wtext
 
 from client import room, stop_event, id
 from client.tcp_client import send
@@ -10,15 +10,21 @@ HZ = 1.0 / FPS
 MOVE_SPEED = 5
 TURN_SPEED = 3
 
+def set_username(input: winput):
+	username = input.text
+	if username is not None: send(ClientEvents.USERNAME, (username.encode("ASCII"),))
+wtext(text="Username: ")
+username_input = winput(bind=set_username)
+
 scene.userzoom = False
 scene.userspin = False
 scene.userpan = False
 scene.autoscale = False
-scene.camera.pos = vec(0, 1, 0)
-scene.camera.axis = vec(0, 0, 1)
+scene.camera.pos = vector(0, 1, 0)
+scene.camera.axis = vector(0, 0, 1)
 
-object = sphere(pos=vec(0, 1, 5), color = color.red, radius = 1)
-floor = box(pos=vec(0, -0.1, 0), size=vec(40, 0.2, 40), color=color.gray(0.5))
+object = sphere(pos=vector(0, 1, 5), color = color.red, radius = 1)
+floor = box(pos=vector(0, -0.1, 0), size=vector(40, 0.2, 40), color=color.gray(0.5))
 
 pitch = 0.0
 yaw = 0.5 * pi
@@ -38,10 +44,10 @@ def game():
 			if "right" in k: yaw += TURN_SPEED * HZ
 			if "left" in k: yaw -= TURN_SPEED * HZ
 	
-			scene.camera.axis = vec(cos(yaw) * cos(pitch), sin(pitch), sin(yaw) * cos(pitch))
+			scene.camera.axis = vector(cos(yaw) * cos(pitch), sin(pitch), sin(yaw) * cos(pitch))
 	
-			forward = norm(vec(scene.camera.axis.x, 0, scene.camera.axis.z))
-			right = cross(forward, vec(0, 1, 0))
+			forward = norm(vector(scene.camera.axis.x, 0, scene.camera.axis.z))
+			right = cross(forward, vector(0, 1, 0))
 			if "w" in k: scene.camera.pos += forward * MOVE_SPEED * HZ
 			if "s" in k: scene.camera.pos -= forward * MOVE_SPEED * HZ
 			if "d" in k: scene.camera.pos += right * MOVE_SPEED * HZ
