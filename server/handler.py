@@ -84,10 +84,11 @@ class Handler(socketserver.BaseRequestHandler):
 		self.game_server.broadcast(event, data, exclude=(self.id,))
 
 	def send(self, event: ServerEvents, data: tuple[Any, ...]):
-		format = server_event_headers[event](*data)
-		self.send_raw(struct.pack(HEADER_FORMAT, event, N := len(format)))
-		self.send_raw(struct.pack(f"{N}s", format.encode("ASCII")))
-		self.send_raw(struct.pack(format, *data))
+		self.send_raw(
+			struct.pack(HEADER_FORMAT, event, N := len(format := server_event_headers[event](*data))) +
+			struct.pack(f"{N}s", format.encode("ASCII")) +
+			struct.pack(format, *data)
+		)
 
 	def send_raw(self, buf: bytes):
 		self.request.sendall(buf)

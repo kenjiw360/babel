@@ -38,9 +38,12 @@ class Server(socketserver.ThreadingTCPServer):
 		with self.clients_lock:
 			for client in self.clients.values():
 				if client.id in exclude: continue
-				client.send_raw(struct.pack(HEADER_FORMAT, event, N))
-				client.send_raw(struct.pack(f"{N}s", format.encode("ASCII")))
-				client.send_raw(buf)
+				try: client.send_raw(
+					struct.pack(HEADER_FORMAT, event, N) +
+					struct.pack(f"{N}s", format.encode("ASCII")) +
+					buf
+				)
+				except BaseException as e: print(e)
 
 	@property
 	def client_list(self):

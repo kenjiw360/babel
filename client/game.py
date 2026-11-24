@@ -2,13 +2,14 @@ from vpython import keysdown, rate, scene, norm, cross, sin, cos, vector, pi, co
 
 from client import stop_event
 from client.tcp_socket import send
-from constants import FPS
 from protocol.client import ClientEvents
+from settings import client_settings
 
 
+FPS = client_settings.fps
 HZ = 1.0 / FPS
 MOVE_SPEED = 5
-TURN_SPEED = 3
+TURN_SPEED = client_settings.turn_speed
 
 scene.userzoom = False
 scene.userspin = False

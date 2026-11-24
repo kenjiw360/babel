@@ -11,10 +11,11 @@ sock.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
 sock.settimeout(0.2)
 
 def send(event: ClientEvents, data: tuple[Any, ...]):
-	format = client_event_headers[event](*data)
-	sock.sendall(struct.pack(HEADER_FORMAT, event, N := len(format)))
-	sock.sendall(struct.pack(f"{N}s", format.encode("ASCII")))
-	sock.sendall(struct.pack(format, *data))
+	sock.sendall(
+		struct.pack(HEADER_FORMAT, event, N := len(format := client_event_headers[event](*data))) +
+		struct.pack(f"{N}s", format.encode("ASCII")) +
+		struct.pack(format, *data)
+	)
 
 def recv_size(size: int):
 	buf = bytearray()

@@ -1,0 +1,13 @@
+# Server settings
+server:
+  host: 0.0.0.0
+  port: 8080
+  book_len: 5
+
+# Client settings
+client:
+  fps: 60
+  camera_sensitivity: 3
+  connection:
+    host: localhost
+    port: 8080
