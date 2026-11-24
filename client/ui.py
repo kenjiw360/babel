@@ -4,12 +4,6 @@ from client.tcp_socket import send
 from protocol.client import ClientEvents
 
 
-def luminance(r: float, g: float, b: float):
-	return r * 0.299 + g * 0.587 + b * 0.114
-
-def spacer():
-	scene.append_to_caption("\n")
-
 class UI:
 	def __init__(self):
 		wtext(text="username: ")
@@ -43,4 +37,14 @@ class UI:
 		self.set_button.background = vector(r, g, b)
 		self.set_button.textcolor = vector(color.white if luminance(r, g, b) < 0.5 else color.black)
 
-ui = UI()
+ui: UI | None = None
+
+def initialize_ui():
+	global ui
+	ui = UI()
+
+def luminance(r: float, g: float, b: float):
+	return r * 0.299 + g * 0.587 + b * 0.114
+
+def spacer():
+	scene.append_to_caption("\n")

@@ -9,7 +9,7 @@ from protocol.server import ServerEvents
 
 def room_info(cid: int, *args):
 	id.append(cid)
-	ui.username_input.text = f"Client {cid}"
+	if ui: ui.username_input.text = f"Client {cid}"
 	with room_lock:
 		for pid, x, z, yaw, username, r, g, b in batched(args, 8):
 			room[pid] = Player(pid, username.rstrip(b"\x00").decode("ASCII"), r, g, b, x, z, yaw)

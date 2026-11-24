@@ -2,11 +2,12 @@ import logging
 import os
 import threading
 
-import client.ui
 from client import stop_event
 from client.game import game
 from client.tcp_client import tcp_client
+from client.ui import initialize_ui
 
+initialize_ui()
 logger = logging.getLogger(__name__)
 thread_error: BaseException | None = None
 
