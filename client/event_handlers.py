@@ -13,7 +13,6 @@ def room_info(cid: int, *args):
 	with room_lock:
 		for pid, x, z, yaw, username, r, g, b in batched(args, 8):
 			room[pid] = Player(pid, username.rstrip(b"\x00").decode("ASCII"), r, g, b, x, z, yaw)
-			if pid == id[0]: room[pid].hide()
 
 def player_join(pid: int, x: float, z: float, yaw: float, username: bytes, r: float, g: float, b: float):
 	with room_lock:
@@ -21,8 +20,7 @@ def player_join(pid: int, x: float, z: float, yaw: float, username: bytes, r: fl
 
 def player_leave(pid: int):
 	with room_lock:
-		room[pid].hide()
-		del room[pid]
+		room[pid].destroy()
 
 def player_info(pid: int, username: bytes, r: float, g: float, b: float):
 	with room_lock:
