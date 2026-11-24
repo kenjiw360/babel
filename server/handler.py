@@ -1,9 +1,9 @@
 import socketserver
 import struct
-
 from collections.abc import Callable
 from itertools import chain
 from typing import Any, cast
+
 from vpython import pi
 
 from protocol import HEADER_FORMAT, HEADER_SIZE

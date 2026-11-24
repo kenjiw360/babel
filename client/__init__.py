@@ -1,6 +1,16 @@
 import threading
 
-from vpython import box, sphere, vector, color, label, compound, sin, cos, standardAttributes
+from vpython import (
+	box,
+	color,
+	compound,
+	cos,
+	label,
+	sin,
+	sphere,
+	standardAttributes,
+	vector,
+)
 
 id: list[int] = []
 stop_event = threading.Event()

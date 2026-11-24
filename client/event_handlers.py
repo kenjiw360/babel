@@ -2,9 +2,10 @@ from collections.abc import Callable
 from itertools import batched
 from typing import Any
 
-from client import room_lock, room, Player, id
+from client import Player, id, room, room_lock
 from client.ui import ui
 from protocol.server import ServerEvents
+
 
 def room_info(cid: int, *args):
 	id.append(cid)

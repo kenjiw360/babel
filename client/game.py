@@ -1,10 +1,22 @@
-from vpython import keysdown, rate, scene, norm, cross, sin, cos, vector, pi, color, sphere, box
+from vpython import (
+	box,
+	color,
+	cos,
+	cross,
+	keysdown,
+	norm,
+	pi,
+	rate,
+	scene,
+	sin,
+	sphere,
+	vector,
+)
 
 from client import stop_event
 from client.tcp_socket import send
 from protocol.client import ClientEvents
 from settings import client_settings
-
 
 FPS = client_settings.fps
 HZ = 1.0 / FPS

@@ -3,7 +3,6 @@ import os
 import threading
 
 import client.ui
-
 from client import stop_event
 from client.game import game
 from client.tcp_client import tcp_client

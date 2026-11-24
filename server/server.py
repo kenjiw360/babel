@@ -1,12 +1,11 @@
 import socketserver
 import struct
 import threading
-
 from itertools import count
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
+
 from protocol import HEADER_FORMAT
 from protocol.server import ServerEvents, server_event_headers
-
 
 if TYPE_CHECKING:
 	from server.handler import Handler
