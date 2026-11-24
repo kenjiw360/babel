@@ -27,16 +27,20 @@ python -m client
 
 ## Editing settings
 
-Edit the game and server settings in `constants.py`.
+Edit the game and server settings in `config.yml`.
 
-```python
-# Sever connectivity
-HOST = "localhost"
-PORT = 8080
-
+```yml
 # Server settings
-BOOK_LEN = 5
+server:
+  host: 0.0.0.0
+  port: 8080
+  book_len: 5
 
-# Game settings
-FPS = 165
+# Client settings
+client:
+  fps: 60
+  camera_sensitivity: 3
+  connection:
+    host: localhost
+    port: 8080
 ```
