@@ -1,8 +1,10 @@
 import socketserver
 import struct
+
 from collections.abc import Callable
 from itertools import chain
 from typing import Any, cast
+from vpython import pi
 
 from protocol import HEADER_FORMAT, HEADER_SIZE
 from protocol.client import ClientEvents
@@ -14,7 +16,7 @@ class Handler(socketserver.BaseRequestHandler):
 	id: int
 	username: str
 	color: tuple[float, float, float] = (0.0, 0.0, 1.0)
-	pos: tuple[float, float, float] = (0.0, 0.0, 0.0)
+	pos: tuple[float, float, float] = (0.0, 0.0, 0.5 * pi)
 
 	def setup(self):
 		self.id = self.game_server.register_client(self)
