@@ -23,9 +23,6 @@ floor = box(pos=vector(0, -0.1, 0), size=vector(40, 0.2, 40), color=color.gray(0
 pitch = 0.0
 yaw = 0.5 * pi
 
-def clamped(x):
-	return max(-0.49*pi, min(0.49*pi, x))
-
 def game():
 	global pitch, yaw
 	last_update = 0
@@ -47,10 +44,14 @@ def game():
 			if "s" in k: scene.camera.pos -= forward * MOVE_SPEED * HZ
 			if "d" in k: scene.camera.pos += right * MOVE_SPEED * HZ
 			if "a" in k: scene.camera.pos -= right * MOVE_SPEED * HZ
-	
+
+		last_update += 1
 		if len(k) or last_update > 3000:
 			send_position()
 			last_update = 0
+
+def clamped(x):
+	return max(-0.49*pi, min(0.49*pi, x))
 
 def send_position():
 	send(ClientEvents.POSITION, (scene.camera.pos.x, scene.camera.pos.z, yaw))

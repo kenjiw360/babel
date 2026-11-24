@@ -16,7 +16,7 @@ class Player:
 
 	def __init__(self, pid: int, username: str, r: float, g: float, b: float, x: float, z: float, yaw: float):
 		self.id = pid
-		base = box(pos=vector(0, 0.65, 0), size=vector(0.5, 1.3, 0.5), color=vector(r, g, b))
+		base = box(pos=vector(0, 0.65, 0), size=vector(0.5, 1.3, 0.5), color=color.white)
 		eye1 = sphere(pos=vector(0.25, 1.1, 0.1), color=color.black, radius=0.075)
 		eye2 = sphere(pos=vector(0.25, 1.1, -0.1), color=color.black, radius=0.075)
 		self.tag = label(text="JorgeLuisBorges")
@@ -38,6 +38,7 @@ class Player:
 	def setInfo(self, username: str, r: float, g: float, b: float):
 		self.tag.text = self.username = username
 		self.color = (r, g, b)
+		self.body.color = vector(r, g, b)
 	
 	def hide(self):
 		self.body.visible = False

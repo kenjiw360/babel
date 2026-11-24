@@ -12,7 +12,6 @@ sock.settimeout(0.2)
 
 def send(event: ClientEvents, data: tuple[Any, ...]):
 	format = client_event_headers[event](*data)
-	print(format, data)
 	sock.sendall(struct.pack(HEADER_FORMAT, event, N := len(format)))
 	sock.sendall(struct.pack(f"{N}s", format.encode("ASCII")))
 	sock.sendall(struct.pack(format, *data))
