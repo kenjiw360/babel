@@ -13,9 +13,6 @@ from vpython import (
 	vector,
 )
 
-import client
-
-
 class PlayerModel:
 	owner: int = -1
 	tag: label

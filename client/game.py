@@ -1,13 +1,11 @@
 from vpython import (
 	color,
-	cos,
 	cross,
 	keysdown,
 	norm,
 	pi,
 	rate,
 	scene,
-	sin,
 	sphere,
 	vector,
 )

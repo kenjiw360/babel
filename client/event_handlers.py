@@ -11,9 +11,11 @@ from protocol.server import ServerEvents
 
 def room_info(cid: int, *args):
 	state.set_id(cid)
+	print("id", cid)
 	if client.ui.ui: client.ui.ui.username_input.text = f"Client {cid}"
 	with room_lock:
 		for pid, x, z, yaw, username, r, g, b in batched(args, 8):
+			print("player", pid, x, z, yaw, username, r, g, b )
 			room[pid] = Player(pid, username.rstrip(b"\x00").decode("ASCII"), r, g, b, x, z, yaw)
 
 def player_join(pid: int, x: float, z: float, yaw: float, username: bytes, r: float, g: float, b: float):
