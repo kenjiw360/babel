@@ -9,13 +9,12 @@ from vpython import (
 	paths,
 	pi,
 	shapes,
-	standardAttributes,
 	vector,
 )
 
 
 def mid_point(p1: list[float], p2: list[float]):
-	return vector(0.5*(p1[1]+p2[1]), 0, 0.5*(p1[0]+p2[0]))
+	return 0.5 * vector(p1[1]+p2[1], 0, p1[0]+p2[0])
 
 def path_to_points(path: list[vector]) -> list[list[float]]:
 	return [[0.5 * v.x, -0.5 * v.z] for v in path]
@@ -75,7 +74,7 @@ class WallModel:
 	book_shelves: list[BookShelfModel]
 	wall: extrusion
 	shelves: extrusion
-	def __init__(self, n: int, m: int):		
+	def __init__(self, n: int, m: int):
 		unit_norm = norm(mid_points[m])
 		from_point = origins[n] + mid_points[m] + vector(0, 1.5, 0)
 		wall_point = from_point - unit_norm * 0.1

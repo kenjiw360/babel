@@ -5,11 +5,12 @@ from typing import Any
 import client
 import client.ui
 from client.players import Player, room, room_lock
+from client.state import state
 from protocol.server import ServerEvents
 
 
 def room_info(cid: int, *args):
-	client.id = cid
+	state.set_id(cid)
 	if client.ui.ui: client.ui.ui.username_input.text = f"Client {cid}"
 	with room_lock:
 		for pid, x, z, yaw, username, r, g, b in batched(args, 8):

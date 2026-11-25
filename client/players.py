@@ -1,5 +1,6 @@
 from threading import Lock
 
+from client.state import state
 from vpython import (
 	box,
 	color,
@@ -49,7 +50,7 @@ class PlayerModel:
 
 	def setOwner(self, owner: int):
 		self.owner = owner
-		self._set_visibility(owner != client.id)
+		self._set_visibility(owner != state.id)
 
 	def free(self):
 		self.owner = -1
