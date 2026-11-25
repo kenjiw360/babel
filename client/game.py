@@ -1,5 +1,4 @@
 from vpython import (
-	box,
 	color,
 	cos,
 	cross,
@@ -14,6 +13,7 @@ from vpython import (
 )
 
 from client import stop_event
+from client.map import LevelModel
 from client.tcp_socket import send
 from protocol.client import ClientEvents
 from settings import client_settings
@@ -31,10 +31,12 @@ scene.camera.pos = vector(0, 1, 0)
 scene.camera.axis = vector(0, 0, 1)
 
 object = sphere(pos=vector(0, 1, 5), color = color.red, radius = 1)
-floor = box(pos=vector(0, -0.1, 0), size=vector(40, 0.2, 40), color=color.gray(0.5))
+# floor = box(pos=vector(0, -0.1, 0), size=vector(40, 0.2, 40), color=color.gray(0.5))
 
 pitch = 0.0
 yaw = 0.5 * pi
+
+level = LevelModel()
 
 def game():
 	global pitch, yaw

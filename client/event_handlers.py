@@ -2,13 +2,14 @@ from collections.abc import Callable
 from itertools import batched
 from typing import Any
 
+import client
 import client.ui
-from client import Player, id, room, room_lock
+from client.players import Player, room, room_lock
 from protocol.server import ServerEvents
 
 
 def room_info(cid: int, *args):
-	id.append(cid)
+	client.id = cid
 	if client.ui.ui: client.ui.ui.username_input.text = f"Client {cid}"
 	with room_lock:
 		for pid, x, z, yaw, username, r, g, b in batched(args, 8):
